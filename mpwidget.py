@@ -10,9 +10,8 @@ class MpWidget(QWidget):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        fig, ax = plt.subplots()
-        fig.patch.set_facecolor("#f4f5f5")
-        fig.set_facecolor("#ffffff")
+        fig = Figure()
+        fig.patch.set_facecolor("#ffffff")
         self.canvas = FigureCanvas(fig)
 
         vertical_layout = QVBoxLayout()

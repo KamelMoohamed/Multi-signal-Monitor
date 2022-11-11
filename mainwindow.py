@@ -1,5 +1,8 @@
+import time
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from drawing import Drawing
 
 class Ui_MatplotlibWindow(object):
     def setupUi(self, MatplotlibWindow):
@@ -191,9 +194,49 @@ class Ui_MatplotlibWindow(object):
         self.graph_type.setText(_translate("MatplotlibWindow", "Select Graph Type:"))
         self.comboBox.setItemText(0, _translate("MainWindow", "X-bar Chart"))
         self.comboBox.setItemText(1, _translate("MainWindow", "X-bar Chart Range"))
-from mpwidget import MpWidget
-import resources
 
+        self._percentage = 0
+        timer = QtCore.QTimer(MatplotlibWindow, interval=50, timeout=self.handle_timeout)
+        timer.start()
+        self.handle_timeout()
+
+    @property
+    def percentage(self):
+        return self._percentage
+
+    def handle_timeout(self):
+        self.update_graph()
+
+    def update_graph(self):
+        selectedSignal = 1
+        selectedGraph = 2
+
+        # Get The Graph Type
+        graphType = self.comboBox.currentText()
+        if graphType == "X-bar Chart Range":
+            selectedGraph = 2
+        else:
+            selectedGraph = 1
+
+        # Get The Signal Type
+        if self.signal1Checkbox.isChecked():
+            selectedSignal = 1
+
+        if self.signal2Checkbox.isChecked():
+            selectedSignal = 2
+
+        if self.signal3Checkbox.isChecked():
+            selectedSignal = 3
+
+        drawing = Drawing()
+        df = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal)
+
+        self.graph_widget.canvas.axes.clear()
+        # TODO: UPDATE HERE
+        self.graph_widget.canvas.axes.plot(df.iloc[:, 0], df.iloc[:, 1])
+        self.graph_widget.canvas.draw()
+
+from mpwidget import MpWidget
 
 if __name__ == "__main__":
     import sys
