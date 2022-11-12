@@ -193,10 +193,10 @@ class Ui_MatplotlibWindow(object):
         self.max_label_3.setText(_translate("MatplotlibWindow", "Select Your Signal:"))
         self.graph_type.setText(_translate("MatplotlibWindow", "Select Graph Type:"))
         self.comboBox.setItemText(0, _translate("MainWindow", "X-bar Chart"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "X-bar Chart Range"))
+        self.comboBox.setItemText(1, _translate("MainWindow", "R Chart"))
 
         self._percentage = 0
-        timer = QtCore.QTimer(MatplotlibWindow, interval=40, timeout=self.handle_timeout)
+        timer = QtCore.QTimer(MatplotlibWindow, interval=50, timeout=self.handle_timeout)
         timer.start()
         self.handle_timeout()
 
@@ -213,7 +213,7 @@ class Ui_MatplotlibWindow(object):
 
         # Get The Graph Type
         graphType = self.comboBox.currentText()
-        if graphType == "X-bar Chart Range":
+        if graphType == "R Chart":
             selectedGraph = 2
         else:
             selectedGraph = 1
@@ -229,10 +229,14 @@ class Ui_MatplotlibWindow(object):
             selectedSignal = 3
 
         drawing = Drawing()
-        signal = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal)
+        signal,upper_limit,mean_line,lower_limit,alarm_flag = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal)
         self.graph_widget.canvas.axes.clear()
-        # TODO: UPDATE HERE
-        self.graph_widget.canvas.axes.plot(signal)
+        self.graph_widget.canvas.axes.plot(signal,linestyle='-', marker='o')
+        self.graph_widget.canvas.axes.axhline(upper_limit,color="red")
+        self.graph_widget.canvas.axes.axhline(mean_line,color="green")
+        self.graph_widget.canvas.axes.axhline(lower_limit,color="red")
+        self.graph_widget.canvas.axes.set_ylim(-0.5,1.6)
+
         self.graph_widget.canvas.draw()
 
 from mpwidget import MpWidget
