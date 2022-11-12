@@ -3,9 +3,14 @@ import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from drawing import Drawing
+from pyfirmata import Arduino ,util
 
 class Ui_MatplotlibWindow(object):
     def setupUi(self, MatplotlibWindow):
+        board=Arduino('COM3')
+        iterator=util.Iterator(board)
+        iterator.start()
+        self.GSR=board.get_pin('a:0:i')
         MatplotlibWindow.setWindowFlag(QtCore.Qt.FramelessWindowHint)
         MatplotlibWindow.setObjectName("MatplotlibWindow")
         MatplotlibWindow.setEnabled(True)
@@ -229,9 +234,10 @@ class Ui_MatplotlibWindow(object):
             selectedSignal = 3
 
         drawing = Drawing()
-        signal = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal)
+        signal = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal,GSR= self.GSR)
         self.graph_widget.canvas.axes.clear()
         # TODO: UPDATE HERE
+   
         self.graph_widget.canvas.axes.plot(signal)
         self.graph_widget.canvas.draw()
 
