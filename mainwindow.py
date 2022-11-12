@@ -196,7 +196,7 @@ class Ui_MatplotlibWindow(object):
         self.comboBox.setItemText(1, _translate("MainWindow", "X-bar Chart Range"))
 
         self._percentage = 0
-        timer = QtCore.QTimer(MatplotlibWindow, interval=50, timeout=self.handle_timeout)
+        timer = QtCore.QTimer(MatplotlibWindow, interval=40, timeout=self.handle_timeout)
         timer.start()
         self.handle_timeout()
 
@@ -229,11 +229,10 @@ class Ui_MatplotlibWindow(object):
             selectedSignal = 3
 
         drawing = Drawing()
-        df = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal)
-
+        signal = drawing.get_data_frame(graph_type = selectedGraph, signal_type = selectedSignal)
         self.graph_widget.canvas.axes.clear()
         # TODO: UPDATE HERE
-        self.graph_widget.canvas.axes.plot(df.iloc[:, 0], df.iloc[:, 1])
+        self.graph_widget.canvas.axes.plot(signal)
         self.graph_widget.canvas.draw()
 
 from mpwidget import MpWidget
