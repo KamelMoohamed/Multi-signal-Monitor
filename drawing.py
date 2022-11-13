@@ -5,9 +5,8 @@ import statistics
 
 
 class Drawing:
-    def get_data_frame(self, graph_type, signal_type, GSR, isPortOpen):
-        signalObj = Signal()
-        signal = signalObj.getSignal(signal_type, GSR, isPortOpen)
+    def get_data_frame(self, graph_type, signal_type):
+        signal = Signal.getSignal(signal_type)
         
 
         if graph_type == 1:

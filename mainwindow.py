@@ -3,19 +3,9 @@ import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from drawing import Drawing
-from pyfirmata import Arduino ,util
 
 class Ui_MatplotlibWindow(object):
     def setupUi(self, MatplotlibWindow):
-        self.GSR = 0
-        try:
-            board=Arduino('COM3')
-            iterator=util.Iterator(board)
-            iterator.start()
-            self.GSR=board.get_pin('a:0:i')
-            self.isPortOpen = True
-        except:
-            self.isPortOpen = False
         MatplotlibWindow.setWindowFlag(QtCore.Qt.FramelessWindowHint)
         MatplotlibWindow.setObjectName("MatplotlibWindow")
         MatplotlibWindow.setEnabled(True)
@@ -241,9 +231,7 @@ class Ui_MatplotlibWindow(object):
         drawing = Drawing()
 
         signal, upper_limit, mean_line,lower_limit, alarm_flag = drawing.get_data_frame(graph_type = selectedGraph, 
-                                                                    signal_type = selectedSignal, 
-                                                                    GSR=self.GSR,
-                                                                    isPortOpen=self.isPortOpen)
+                                                                    signal_type = selectedSignal)
         self.graph_widget.canvas.axes.clear()
         self.graph_widget.canvas.axes.plot(signal,linestyle='-', marker='o')
         self.graph_widget.canvas.axes.axhline(upper_limit,color="red")

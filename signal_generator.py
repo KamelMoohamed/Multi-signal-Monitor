@@ -1,8 +1,8 @@
 import neurokit2 as nk
 import numpy as np
-from pyfirmata import Arduino ,util
 import time
 import pandas as pd
+import serial
 
 
 class Signal:
@@ -17,15 +17,17 @@ class Signal:
     ecg_data = nk.ecg_simulate(duration=30)[::5]
     rsp_data= nk.rsp_simulate(duration=30,respiratory_rate=30)[::5]
     rsp_signal=np.zeros(600)
+    real_time_signal=np.zeros(600)
     counter = 0
 
 
-    def getSignal(self, type, GSR, isPortOpen):
+    def getSignal(type):
         Signal.generate_ecg()
         Signal.generate_rsp()
+        Signal.get_realtime()
 
-        if type == 1 and isPortOpen:
-            return self.get_realtime(GSR)
+        if type == 1 :
+            return Signal.real_time_signal
         elif type==2:
             return Signal.ecg_signal
         else:
@@ -46,26 +48,22 @@ class Signal:
             Signal.rsp_data[5:], Signal.rsp_data[:5])
 
 
-    def get_realtime(self, GSR):
-        sensorValue = 0
-        gsrAverage = 0
-        i = 0
-        lst = []
-
-        while i<50:
-            sum=0
-            for j in range (60000):
-                try:
-                    sensorValue = GSR.read()
-                    sum += int(sensorValue*1000)
-                    gsrAverage=sum/10
-                except:
-                    print('Error Occured')
-            try:
-                test = int(gsrAverage)
-                lst.append(gsrAverage)
-            except:
-                print('Error Occured')
-            i+=1
-        return np.array(lst)
+    def get_realtime():
+        arduino = serial.Serial(port='COM3', baudrate=115200)
+        reads=[]
+        for i in range(5):
+            while True:
+                counter=0
+                dataBarCode = arduino.readline()
+                if len(dataBarCode) >= 1 and counter<=5:
+                    try:
+                        number= int(dataBarCode.decode("utf-8"))
+                        reads.append(number)
+                        break
+                    except:
+                        continue
+        arduino.close()
+        
+        Signal.real_time_signal = np.append(
+            Signal.real_time_signal[5:], np.array(reads))
 
