@@ -206,7 +206,7 @@ class Ui_MatplotlibWindow(object):
         self.comboBox.setItemText(1, _translate("MainWindow", "R Chart"))
 
         self._percentage = 0
-        timer = QtCore.QTimer(MatplotlibWindow, interval=50, timeout=self.handle_timeout)
+        timer = QtCore.QTimer(MatplotlibWindow, interval=100, timeout=self.handle_timeout)
         timer.start()
         self.handle_timeout()
 
