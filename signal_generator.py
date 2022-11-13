@@ -4,31 +4,6 @@ from pyfirmata import Arduino ,util
 import time
 import pandas as pd
 
-def get_realtime(GSR):
-    sensorValue = 0
-    gsr_average = 0
-    i = 0
-    time_lst=[]
-    values_lst=[]
-
-    while i<50:
-        sum=0
-        for j in range (60000):
-            try:
-                sensorValue=GSR.read()
-                sum+=int(sensorValue*1000)
-                gsr_average=sum/10
-            except:
-                print('Error Occured')
-        try:
-            v=int(gsr_average)
-            time_lst.append(i*0.0005)
-            values_lst.append(gsr_average)
-        except:
-            print('Error Occured')
-        i+=1
-    return(pd.DataFrame({'t':time_lst,'y':values_lst}))
-        
 
 class Signal:
     ti = np.array((-70, -15, 0, 15, 100))
@@ -45,17 +20,17 @@ class Signal:
     counter = 0
 
 
-    def getSignal(type,GSR):
+    def getSignal(self, type, GSR, isPortOpen):
         Signal.generate_ecg()
         Signal.generate_rsp()
 
-        if type==2:
+        if type == 1 and isPortOpen:
+            return self.get_realtime(GSR)
+        elif type==2:
             return Signal.ecg_signal
-        elif type==3:
-            return Signal.rsp_signal
         else:
+            return Signal.rsp_signal
             
-            return get_realtime(GSR)
 
     def generate_ecg():
         Signal.ecg_signal = np.append(
@@ -71,6 +46,26 @@ class Signal:
             Signal.rsp_data[5:], Signal.rsp_data[:5])
 
 
+    def get_realtime(self, GSR):
+        sensorValue = 0
+        gsrAverage = 0
+        i = 0
+        lst = []
 
-
+        while i<50:
+            sum=0
+            for j in range (60000):
+                try:
+                    sensorValue = GSR.read()
+                    sum += int(sensorValue*1000)
+                    gsrAverage=sum/10
+                except:
+                    print('Error Occured')
+            try:
+                test = int(gsrAverage)
+                lst.append(gsrAverage)
+            except:
+                print('Error Occured')
+            i+=1
+        return np.array(lst)
 
